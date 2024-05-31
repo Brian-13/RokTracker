@@ -402,11 +402,14 @@ try:
 		sheet1.write(i+1-j, 13, today, datestyle)
         
 		#Print estimated time left
-		ti = time.time()
-		elapsedi = ti-t0
-		avgi = elapsedi / (i-j+1)
-		tleft = avgi * (search_range - (i-j)-1)
-		print('Estimated time left: ' + time.strftime("%H:%M:%S", time.gmtime(tleft)) + '\n')
+		if i-j == 0 :
+			t1 = time.time()
+		else :
+			t2 = time.time()
+			elapsedi = t2-t1
+			avgi = elapsedi / (i-j)
+			tleft = avgi * (search_range - (i-j)-1)
+			print('Estimated time left: ' + time.strftime("%H:%M:%S", time.gmtime(tleft)) + '\n')
         
         
 except:
@@ -422,8 +425,8 @@ else:
 	file_name_prefix = 'TOP'
 wb.save(file_name_prefix + str(search_range-j) + '-' +str(today)+ '-' + kingdom +'.xls')
 
-t1 = time.time()
-elapsed = t1-t0
+t9 = time.time()
+elapsed = t9-t0
 
 print('Total runtime: ' + time.strftime("%H:%M:%S", time.gmtime(elapsed)))
 
