@@ -401,6 +401,14 @@ try:
 		sheet1.write(i+1-j, 12, tointcheck(kingdom))
 		sheet1.write(i+1-j, 13, today, datestyle)
         
+		#Print estimated time left
+		ti = time.time()
+		elapsedi = ti-t0
+		avgi = elapsedi / (i-j+1)
+		tleft = avgi * (search_range - (i-j)-1)
+		print('Estimated time left: ' + time.strftime("%H:%M:%S", time.gmtime(tleft)) + '\n')
+        
+        
 except:
 	print('An issue has occured. Please rerun the tool and use "resume scan option" from where tool stopped. If issue seems to remain, please contact me on discord!')
 	#Save the excel file in the following format e.g. TOP300-2021-12-25-1253.xls or NEXT300-2021-12-25-1253.xls
@@ -418,3 +426,4 @@ t1 = time.time()
 elapsed = t1-t0
 
 print('Total runtime: ' + time.strftime("%H:%M:%S", time.gmtime(elapsed)))
+
