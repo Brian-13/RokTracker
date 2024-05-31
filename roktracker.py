@@ -33,6 +33,7 @@ def tointprint(element):
 
 #Initiliaze paths and variables
 today = date.today()
+t0 = time.time()
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe' #Change to your installation path folder.
 
@@ -141,6 +142,10 @@ font = xlwt.Font()
 font.bold = True
 style.font = font
 
+#Date Format
+datestyle = xlwt.XFStyle()
+datestyle.num_format_str = 'dd/mm/yyyy'
+
 #Initialize Excel Sheet Header
 sheet1.write(0, 0, 'Governor Name', style)
 sheet1.write(0, 1, 'Governor ID', style)
@@ -154,6 +159,8 @@ sheet1.write(0, 8, 'Tier 4 Kills', style)
 sheet1.write(0, 9, 'Tier 5 Kills', style)
 sheet1.write(0, 10,'Rss Assistance', style)
 sheet1.write(0, 11,'Alliance', style)
+sheet1.write(0, 12,'Kingdom', style)
+sheet1.write(0, 13,'Date', style)
 
 #Position for next governor to check
 Y =[285, 390, 490, 590, 605]
@@ -199,7 +206,7 @@ try:
 		gov_rss_assistance = 0
 		#Open governor
 		device.shell(f'input tap 690 ' + str(Y[k]))
-		time.sleep(1.8)
+		time.sleep(0.5)
 		
 		##### Ensure that governor tab is open #####
 		gov_info = False
@@ -216,7 +223,7 @@ try:
 				device.shell(f'input swipe 690 605 690 540')
 				device.shell(f'input tap 690 ' + str(Y[k]))
 				count += 1
-				time.sleep(2)
+				time.sleep(1)
 				if count == 5:
 					break
 			else:
@@ -225,7 +232,7 @@ try:
 		
 		#nickname copy
 		device.shell(f'input tap 654 245')
-		time.sleep(1.3)
+		time.sleep(1)
 		
 		##### Governor main page capture #####
 		image = device.screencap()
@@ -295,7 +302,7 @@ try:
 		gov_kills_tier3 = pytesseract.image_to_string(im_kills_tier3,config="-c tessedit_char_whitelist=0123456789")
 		gov_kills_tier4 = pytesseract.image_to_string(im_kills_tier4,config="-c tessedit_char_whitelist=0123456789")
 		gov_kills_tier5 = pytesseract.image_to_string(im_kills_tier5,config="-c tessedit_char_whitelist=0123456789")
-		time.sleep(1)
+		time.sleep(0.5)
 		
 		
 		##### More Info Page Capture #####
@@ -338,7 +345,8 @@ try:
 		gray = cv2.cvtColor(im_alliance_tag,cv2.COLOR_BGR2GRAY)
 		threshold_img = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
 		alliance_tag = pytesseract.image_to_string(threshold_img)
-		
+        #remove line breaks from alliance_tag
+		alliance_tag = alliance_tag.replace('\n', '')
 		
 		#Just to check the progress, printing in cmd the result for each governor
 		if gov_power == '':
@@ -375,7 +383,7 @@ try:
 		device.shell(f'input tap 1396 58') #close more info
 		time.sleep(0.5)
 		device.shell(f'input tap 1365 104') #close governor info
-		time.sleep(1)
+		time.sleep(0.5)
 
 		#Write results in excel file
 		sheet1.write(i+1-j, 0, gov_name)
@@ -390,6 +398,9 @@ try:
 		sheet1.write(i+1-j, 9, tointcheck(gov_kills_tier5))
 		sheet1.write(i+1-j, 10, tointcheck(gov_rss_assistance))
 		sheet1.write(i+1-j, 11, alliance_tag)
+		sheet1.write(i+1-j, 12, tointcheck(kingdom))
+		sheet1.write(i+1-j, 13, today, datestyle)
+        
 except:
 	print('An issue has occured. Please rerun the tool and use "resume scan option" from where tool stopped. If issue seems to remain, please contact me on discord!')
 	#Save the excel file in the following format e.g. TOP300-2021-12-25-1253.xls or NEXT300-2021-12-25-1253.xls
@@ -402,3 +413,8 @@ if resume_scanning :
 else:
 	file_name_prefix = 'TOP'
 wb.save(file_name_prefix + str(search_range-j) + '-' +str(today)+ '-' + kingdom +'.xls')
+
+t1 = time.time()
+elapsed = t1-t0
+
+print('Total runtime: ' + time.strftime("%H:%M:%S", time.gmtime(elapsed)))
